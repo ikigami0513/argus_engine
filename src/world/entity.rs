@@ -1,6 +1,5 @@
 use crate::{graphics::model::Model, world::component::Component};
-
-use super::transform::Transform;
+use crate::world::transform::Transform;
 
 pub struct Entity {
     components: Vec<Component>,
@@ -12,7 +11,7 @@ impl Entity {
     pub fn new(model: Option<Model>, transform: Transform) -> Self {
         Entity {
             components: Vec::new(),
-            transform: transform,
+            transform,
             model
         }
     }

@@ -2,12 +2,13 @@ extern crate glfw;
 extern crate gl;
 
 use glfw::{ Context, Key, Action };
+use std::collections::HashMap;
 use std::sync::mpsc::Receiver;
 use std::ffi::CStr;
 use cgmath::{ perspective, vec3, Deg, Matrix4, Point3 };
 use crate::graphics::camera::{ Camera, CameraMovement };
 use crate::graphics::model::Model;
-use crate::graphics::shader::Shader;
+use crate::graphics::shader::{Shader, ShaderType};
 use crate::world::entity::Entity;
 use crate::world::scene::Scene;
 use crate::world::transform::Transform;
@@ -26,7 +27,7 @@ pub struct Application {
     last_y: f32,
     delta_time: f32,
     last_frame: f32,
-    shader: Shader,
+    shaders: HashMap<ShaderType, Shader>,
     scene: Scene
 }
 
@@ -57,18 +58,16 @@ impl Application {
         // gl: load all OpenGL function pointers
         gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
 
-        let shader = unsafe {
-            // configure global opengl state
+        // load all shaders
+        let mut shaders: HashMap<ShaderType, Shader> = HashMap::new();
+        unsafe {
             gl::Enable(gl::DEPTH_TEST);
 
-            // build and compile shaders
-            Shader::new(
-                "src/graphics/shaders/model.vs",
-                "src/graphics/shaders/model.fs"
-            )
-        };
+            shaders.insert(ShaderType::MODEL, Shader::new("src/graphics/shaders/model.vs", "src/graphics/shaders/model.fs"));
+            shaders.insert(ShaderType::SKYBOX, Shader::new("src/graphics/shaders/skybox.vs", "src/graphics/shaders/skybox.fs"));
+        }
 
-        let mut scene = Scene::default();
+        let mut scene = Scene::new(shaders.get(&ShaderType::SKYBOX).expect("ShaderType is not initialized"));
         let model = Model::new("resources/objects/nanosuit/nanosuit.obj");
         scene.entities.push(Entity::new(
             Some(model),
@@ -92,7 +91,7 @@ impl Application {
             last_y: SCR_HEIGHT as f32 / 2.0,
             delta_time: 0.0,
             last_frame: 0.0,
-            shader,
+            shaders,
             scene
         }
     }
@@ -169,7 +168,9 @@ impl Application {
             gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            self.shader.use_program();
+            self.shaders.get(&ShaderType::MODEL)
+                .expect("ShaderType is not initialized")
+                .use_program();
 
             // view / projection transformations
             let projection: Matrix4<f32> = perspective(
@@ -179,11 +180,26 @@ impl Application {
                 100.0
             );
             let view = self.camera.get_view_matrix();
-            self.shader.set_mat4(c_str!("projection"), &projection);
-            self.shader.set_mat4(c_str!("view"), &view);
+            self.shaders.get(&ShaderType::MODEL)
+                .expect("ShaderType is not initialized")
+                .set_mat4(c_str!("projection"), &projection);
 
-            // render the loaded model
-            self.scene.render(&self.shader);
+            self.shaders.get(&ShaderType::MODEL)
+                .expect("ShaderType is not initialized")
+                .set_mat4(c_str!("view"), &view);
+
+            // update the scene
+            self.scene.update();
+
+            // render the scene
+            self.scene.render(
+                &self.shaders.get(&ShaderType::MODEL).expect("ShaderType is not initialized")
+            );
+            self.scene.skybox.draw(
+                projection, 
+                &self.camera,
+                &self.shaders.get(&ShaderType::SKYBOX).expect("ShaderType is not initialized")
+            );
         }
     }
 }

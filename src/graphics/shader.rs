@@ -10,6 +10,12 @@ use gl::types::*;
 use cgmath::{ Matrix, Matrix4, Vector3 };
 use cgmath::prelude::*;
 
+#[derive(Hash, Eq, PartialEq)]
+pub enum ShaderType {
+    MODEL,
+    SKYBOX
+}
+
 pub struct Shader {
     pub id: u32
 }
