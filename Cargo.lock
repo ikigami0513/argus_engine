@@ -15,6 +15,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08abcc3b4e9339e33a3d0a5ed15d84a687350c05689d825e0f6655eef9e76a94"
 
 [[package]]
+name = "argus_engine"
+version = "0.1.0"
+dependencies = [
+ "cgmath",
+ "gl",
+ "glfw",
+ "image",
+ "num 0.2.1",
+ "rand 0.5.6",
+ "tobj",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -124,19 +137,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be4551092f4d519593039259a9ed8daedf0da12e5109c5280338073eaeb81180"
 dependencies = [
  "num-traits 0.1.43",
-]
-
-[[package]]
-name = "foxvoid_engine"
-version = "0.1.0"
-dependencies = [
- "cgmath",
- "gl",
- "glfw",
- "image",
- "num 0.2.1",
- "rand 0.5.6",
- "tobj",
 ]
 
 [[package]]

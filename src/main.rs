@@ -46,7 +46,7 @@ fn main() {
     let (mut window, events) = glfw.create_window(
         SCR_WIDTH, 
         SCR_HEIGHT, 
-        "Foxvoid Engine",
+        "Argus Engine",
         glfw::WindowMode::Windowed
     ).expect("Failed to create GLFW window");
 
