@@ -1,6 +1,8 @@
 use std::os::raw::c_void;
 use std::path::Path;
+use core::ffi::CStr;
 
+use cgmath::Matrix4;
 use cgmath::{ vec2, vec3 };
 use gl;
 use image;
@@ -10,6 +12,7 @@ use tobj;
 
 use crate::graphics::mesh::Mesh;
 use crate::graphics::shader::Shader;
+use crate::world::entity::Entity;
 
 use super::mesh::Texture;
 use super::mesh::Vertex;
@@ -30,6 +33,18 @@ impl Model {
         let mut model = Model::default();
         model.load_model(path);
         model
+    }
+
+    pub unsafe fn render(&mut self, mut entity: &Entity, shader: &Shader) {
+        shader.use_program();
+        let mut model = Matrix4::<f32>::from_translation(entity.transform.position);
+        model = model * Matrix4::from_nonuniform_scale(
+            entity.transform.scale.x,
+            entity.transform.scale.y,
+            entity.transform.scale.z
+        );
+        shader.set_mat4(c_str!("model"), &model);
+        self.draw(&shader);
     }
 
     pub fn draw(&self, shader: &Shader) {
