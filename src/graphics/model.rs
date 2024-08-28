@@ -12,7 +12,7 @@ use tobj;
 
 use crate::graphics::mesh::Mesh;
 use crate::graphics::shader::Shader;
-use crate::world::entity::Entity;
+use crate::world::transform::Transform;
 
 use super::mesh::Texture;
 use super::mesh::Vertex;
@@ -35,13 +35,13 @@ impl Model {
         model
     }
 
-    pub unsafe fn render(&mut self, mut entity: &Entity, shader: &Shader) {
+    pub unsafe fn render(&mut self, transform: &Transform, shader: &Shader) {
         shader.use_program();
-        let mut model = Matrix4::<f32>::from_translation(entity.transform.position);
+        let mut model = Matrix4::<f32>::from_translation(transform.position);
         model = model * Matrix4::from_nonuniform_scale(
-            entity.transform.scale.x,
-            entity.transform.scale.y,
-            entity.transform.scale.z
+            transform.scale.x,
+            transform.scale.y,
+            transform.scale.z
         );
         shader.set_mat4(c_str!("model"), &model);
         self.draw(&shader);

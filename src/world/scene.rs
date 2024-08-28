@@ -15,9 +15,10 @@ impl Default for Scene {
 impl Scene {
     pub fn render(&mut self, shader: &Shader) {
         for entity in self.entities.iter_mut() {
-            match &mut entity.model {
-                Some(model) => unsafe {model.render(entity, shader)},
-                None => {}
+            if let Some(model) = &mut entity.model {
+                unsafe {
+                    model.render(&entity.transform, shader);
+                }
             }
         }
     }

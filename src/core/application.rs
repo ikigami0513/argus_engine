@@ -75,7 +75,7 @@ impl Application {
             Transform::new(
                 vec3(0.0, -1.75, 0.0),
                 vec3(0.0, 0.0, 0.0),
-                vec3(1.0, 1.0, 1.0)
+                vec3(0.2, 0.2, 0.2)
             )
         ));
 
