@@ -2,8 +2,7 @@ use std::os::raw::c_void;
 use std::path::Path;
 use core::ffi::CStr;
 
-use cgmath::Matrix4;
-use cgmath::{ vec2, vec3 };
+use cgmath::{ vec2, vec3, Matrix4, Rad };
 use gl;
 use image;
 use image::DynamicImage::*;
@@ -37,7 +36,16 @@ impl Model {
 
     pub unsafe fn render(&mut self, transform: &Transform, shader: &Shader) {
         shader.use_program();
+        // apply position of entity
         let mut model = Matrix4::<f32>::from_translation(transform.position);
+        
+        // apply rotation of entity
+        model = model
+            * Matrix4::from_angle_x(Rad(transform.rotation.x))
+            * Matrix4::from_angle_y(Rad(transform.rotation.y))
+            * Matrix4::from_angle_z(Rad(transform.rotation.z));
+        
+        // apply scale of entity
         model = model * Matrix4::from_nonuniform_scale(
             transform.scale.x,
             transform.scale.y,
